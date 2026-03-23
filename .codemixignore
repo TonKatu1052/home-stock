@@ -1,0 +1,7 @@
+.git
+node_modules
+.aiignore
+package-lock.json
+codemix.txt
+*.log
+*.png
