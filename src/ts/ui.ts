@@ -11,24 +11,28 @@ function openModal(
     label: string;
     value: string;
     id: string;
-  }[]
+    type?: string;
+  }[],
+  modalFooterKeys: modalFooterKeys[]
 ): Promise<Record<string, string> | null> {
   return new Promise((resolve) => {
     const modalEl = document.getElementById('editModal')!;
     const titleEl = document.getElementById('modalTitle')!;
     const bodyEl = document.getElementById('modalBody')!;
-    const saveBtn = document.getElementById('modalSave')!;
+    const footerEl = document.getElementById('modalFooter')!;
 
     titleEl.textContent = title;
     bodyEl.innerHTML = '';
+    footerEl.innerHTML = createModalFooter(modalFooterKeys);
+
+    const yesBtn = document.getElementById('modalYes') as HTMLButtonElement;
 
     fields.forEach((f) => {
       const div = document.createElement('div');
       div.className = 'mb-3';
-
       div.innerHTML = `
         <label class="form-label">${f.label}</label>
-        <input class="form-control" id="${f.id}" value="${f.value}">
+        <input type="${f.type || 'text'}" class="form-control" value="${f.value}" data-field="${f.id}">
       `;
       bodyEl.appendChild(div);
     });
@@ -39,9 +43,10 @@ function openModal(
     const handler = () => {
       const result: Record<string, string> = {};
 
-      fields.forEach((f) => {
-        const input = document.getElementById(f.id) as HTMLInputElement;
-        result[f.id] = input.value;
+      const inputs = bodyEl.querySelectorAll<HTMLInputElement>('input[data-field]');
+      inputs.forEach((input) => {
+        const key = input.dataset.field!;
+        result[key] = input.value;
       });
 
       cleanup();
@@ -55,11 +60,11 @@ function openModal(
     };
 
     function cleanup() {
-      saveBtn.removeEventListener('click', handler);
+      yesBtn.removeEventListener('click', handler);
       modalEl.removeEventListener('hidden.bs.modal', cancelHandler);
     }
 
-    saveBtn.addEventListener('click', handler);
+    yesBtn.addEventListener('click', handler);
     modalEl.addEventListener('hidden.bs.modal', cancelHandler);
   });
 }
@@ -70,13 +75,14 @@ function confirmModal(title: string, message: string): Promise<boolean> {
     const modalEl = document.getElementById('editModal')!;
     const titleEl = document.getElementById('modalTitle')!;
     const bodyEl = document.getElementById('modalBody')!;
-    const saveBtn = document.getElementById('modalSave')!;
+    const footerEl = document.getElementById('modalFooter')!;
 
     titleEl.textContent = title;
     bodyEl.innerHTML = `<p>${message}</p>`;
+    footerEl.innerHTML = createModalFooter(['no', 'yes']);
 
-    saveBtn.textContent = 'はい';
-    const cancelBtn = modalEl.querySelector('.btn-secondary') as HTMLButtonElement;
+    const yesBtn = document.getElementById('modalYes') as HTMLButtonElement;
+    const noBtn = document.getElementById('modalNo') as HTMLButtonElement;
 
     const modal = new bootstrap.Modal(modalEl);
     modal.show();
@@ -94,13 +100,26 @@ function confirmModal(title: string, message: string): Promise<boolean> {
     };
 
     function cleanup() {
-      saveBtn.removeEventListener('click', handler);
-      cancelBtn.removeEventListener('click', cancelHandler);
+      yesBtn.removeEventListener('click', handler);
+      noBtn.removeEventListener('click', cancelHandler);
     }
 
-    saveBtn.addEventListener('click', handler);
-    cancelBtn.addEventListener('click', cancelHandler);
+    yesBtn.addEventListener('click', handler);
+    noBtn.addEventListener('click', cancelHandler);
   });
+}
+
+type modalFooterKeys = 'yes' | 'no' | 'save' | 'cancel';
+
+function createModalFooter(key: modalFooterKeys[]): string {
+  const list: Record<modalFooterKeys, string> = {
+    yes: '<button class="btn btn-primary" id="modalYes">はい</button>',
+    no: '<button class="btn btn-secondary" id="modalNo">いいえ</button>',
+    save: '<button class="btn btn-primary" id="modalYes">保存</button>',
+    cancel: '<button class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>',
+  };
+
+  return key.map(k => list[k]).join(' ');
 }
 
 export const ModalUI = {
@@ -120,8 +139,14 @@ export const ModalUI = {
         label: '期限',
         value: item.expiry || '',
         id: 'expiry',
+        type: 'date',
       },
-    ]);
+      {
+        label: '数量',
+        value: item.quantity || '',
+        id: 'quantity',
+      },
+    ], ['cancel', 'save']);
   },
 
   openShoppingEdit(item: any) {
@@ -131,7 +156,12 @@ export const ModalUI = {
         value: item.name,
         id: 'name',
       },
-    ]);
+      {
+        label: '数量',
+        value: item.quantity || '',
+        id: 'quantity',
+      },
+    ], ['cancel', 'save']);
   },
 
   confirmAddToShopping(itemName: string) {
