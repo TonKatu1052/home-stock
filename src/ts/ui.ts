@@ -119,49 +119,57 @@ function createModalFooter(key: modalFooterKeys[]): string {
     cancel: '<button class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>',
   };
 
-  return key.map(k => list[k]).join(' ');
+  return key.map((k) => list[k]).join(' ');
 }
 
 export const ModalUI = {
   openInventoryEdit(item: any) {
-    return openModal('在庫編集', [
-      {
-        label: '商品名',
-        value: item.name,
-        id: 'name',
-      },
-      {
-        label: 'グループ',
-        value: item.group || '',
-        id: 'group',
-      },
-      {
-        label: '期限',
-        value: item.expiry || '',
-        id: 'expiry',
-        type: 'date',
-      },
-      {
-        label: '数量',
-        value: item.quantity || '',
-        id: 'quantity',
-      },
-    ], ['cancel', 'save']);
+    return openModal(
+      '在庫編集',
+      [
+        {
+          label: '商品名',
+          value: item.name,
+          id: 'name',
+        },
+        {
+          label: 'グループ',
+          value: item.group || '',
+          id: 'group',
+        },
+        {
+          label: '期限',
+          value: item.expiry || '',
+          id: 'expiry',
+          type: 'date',
+        },
+        {
+          label: '数量',
+          value: item.quantity || '',
+          id: 'quantity',
+        },
+      ],
+      ['cancel', 'save']
+    );
   },
 
   openShoppingEdit(item: any) {
-    return openModal('買い物編集', [
-      {
-        label: '商品名',
-        value: item.name,
-        id: 'name',
-      },
-      {
-        label: '数量',
-        value: item.quantity || '',
-        id: 'quantity',
-      },
-    ], ['cancel', 'save']);
+    return openModal(
+      '買い物編集',
+      [
+        {
+          label: '商品名',
+          value: item.name,
+          id: 'name',
+        },
+        {
+          label: '数量',
+          value: item.quantity || '',
+          id: 'quantity',
+        },
+      ],
+      ['cancel', 'save']
+    );
   },
 
   confirmAddToShopping(itemName: string) {
@@ -203,14 +211,18 @@ export const UI = {
       expirySpan.className = getExpiryClass(item.expiry);
       expirySpan.textContent = item.expiry || '期限なし';
 
+      const quantitySpan = document.createElement('span');
+      quantitySpan.textContent = item.quantity || '';
+
       meta.appendChild(groupSpan);
       meta.appendChild(document.createTextNode(' / '));
       meta.appendChild(expirySpan);
+      meta.appendChild(document.createTextNode(' / '));
+      meta.appendChild(quantitySpan);
 
       wrapper.appendChild(nameEl);
       wrapper.appendChild(meta);
 
-      // ボタン群
       const btnGroup = document.createElement('div');
 
       const editBtn = document.createElement('button');
@@ -240,9 +252,18 @@ export const UI = {
       const li = document.createElement('li');
       li.className = 'list-group-item d-flex justify-content-between align-items-center';
 
+      const wrapper = document.createElement('div');
+
       const nameEl = document.createElement('span');
       nameEl.className = 'fw-semibold';
       nameEl.textContent = item.name;
+
+      const quantitySpan = document.createElement('span');
+      quantitySpan.textContent = item.quantity || '';
+
+      wrapper.appendChild(nameEl);
+      wrapper.appendChild(document.createTextNode(' / '));
+      wrapper.appendChild(quantitySpan);
 
       const btnGroup = document.createElement('div');
 
@@ -259,7 +280,7 @@ export const UI = {
       btnGroup.appendChild(editBtn);
       btnGroup.appendChild(deleteBtn);
 
-      li.appendChild(nameEl);
+      li.appendChild(wrapper);
       li.appendChild(btnGroup);
       list.appendChild(li);
     });
