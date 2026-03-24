@@ -10,18 +10,20 @@ export const App = {
 
   init() {
     this.bindEvents();
-    this.checkAllExpiry();
+    // this.checkAllExpiry();
     this.render();
   },
 
   bindEvents() {
-    const addBtn = document.getElementById('addBtn')!;
-    const nameInput = document.getElementById('itemName') as HTMLInputElement;
-    const groupInput = document.getElementById('group') as HTMLInputElement;
-    const expiryInput = document.getElementById('expiry') as HTMLInputElement;
+    const addInventoryBtn = document.getElementById('addInventoryBtn')!;
+    const inventoryNameInput = document.getElementById('inventoryName') as HTMLInputElement;
+    const inventoryGroupInput = document.getElementById('inventoryGroup') as HTMLInputElement;
+    const inventoryExpiryInput = document.getElementById('inventoryExpiry') as HTMLInputElement;
+    const inventoryQuantityInput = document.getElementById('inventoryQuantity') as HTMLInputElement;
 
     const addShoppingBtn = document.getElementById('addShoppingBtn')!;
-    const shoppingInput = document.getElementById('shoppingName') as HTMLInputElement;
+    const shoppingNameInput = document.getElementById('shoppingName') as HTMLInputElement;
+    const shoppingQuantityInput = document.getElementById('shoppingQuantity') as HTMLInputElement;
 
     const inventoryTab = document.getElementById('inventoryTab')!;
     const shoppingTab = document.getElementById('shoppingTab')!;
@@ -29,37 +31,40 @@ export const App = {
     const shoppingView = document.getElementById('shoppingView')!;
 
     // 在庫追加
-    addBtn.onclick = () => {
-      if (!nameInput.value.trim()) return;
+    addInventoryBtn.onclick = () => {
+      if (!inventoryNameInput.value.trim()) return;
 
       Inventory.add(this.data, {
         id: createId(),
-        name: nameInput.value.trim(),
-        group: groupInput.value.trim(),
-        expiry: expiryInput.value,
+        name: inventoryNameInput.value.trim(),
+        group: inventoryGroupInput.value.trim(),
+        expiry: inventoryExpiryInput.value,
+        quantity: inventoryQuantityInput.value.trim(),
       });
 
       this.save();
 
-      nameInput.value = '';
-      groupInput.value = '';
-      expiryInput.value = '';
-      nameInput.focus();
+      inventoryNameInput.value = '';
+      inventoryExpiryInput.value = '';
+      inventoryQuantityInput.value = '';
+      inventoryNameInput.focus();
     };
 
     // 買い物追加
     addShoppingBtn.onclick = () => {
-      if (!shoppingInput.value.trim()) return;
+      if (!shoppingNameInput.value.trim()) return;
 
       Shopping.add(this.data, {
         id: createId(),
-        name: shoppingInput.value.trim(),
+        name: shoppingNameInput.value.trim(),
+        quantity: shoppingQuantityInput.value.trim(),
       });
 
       this.save();
 
-      shoppingInput.value = '';
-      shoppingInput.focus();
+      shoppingNameInput.value = '';
+      shoppingQuantityInput.value = '';
+      shoppingNameInput.focus();
     };
 
     // タブ切り替え
@@ -75,7 +80,7 @@ export const App = {
     shoppingTab.onclick = () => toggleTab(false);
   },
 
-  // 使用処理（UIから呼ばれる）
+  // 使用処理
   async useItem(id: string) {
     const item = Inventory.removeById(this.data, id);
     if (!item) return;
@@ -86,13 +91,14 @@ export const App = {
       Shopping.add(this.data, {
         id: createId(),
         name: item.name,
+        quantity: '1',
       });
     }
 
     this.save();
   },
 
-  // 買い物削除（UIから呼ばれる）
+  // 買い物削除
   removeShopping(id: string) {
     Shopping.removeById(this.data, id);
     this.save();
@@ -110,6 +116,7 @@ export const App = {
       name: result.name.trim(),
       group: result.group.trim(),
       expiry: result.expiry || undefined,
+      quantity: result.quantity.trim(),
     });
 
     this.save();
@@ -125,12 +132,13 @@ export const App = {
 
     Shopping.updateById(this.data, id, {
       name: result.name.trim(),
+      quantity: result.quantity.trim(),
     });
 
     this.save();
   },
 
-  // 期限チェック（起動時）
+  // 期限チェック
   checkAllExpiry() {
     const notifyItems = getNotifyItems(this.data.inventory);
 
