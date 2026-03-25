@@ -144,9 +144,10 @@ export const ModalUI = {
           type: 'date',
         },
         {
-          label: '数量',
+          label: '個数',
           value: item.quantity || '',
           id: 'quantity',
+          type: 'number',
         },
       ],
       ['cancel', 'save']
@@ -163,9 +164,10 @@ export const ModalUI = {
           id: 'name',
         },
         {
-          label: '数量',
+          label: '個数',
           value: item.quantity || '',
           id: 'quantity',
+          type: 'number',
         },
       ],
       ['cancel', 'save']
@@ -212,7 +214,7 @@ export const UI = {
       expirySpan.textContent = item.expiry || '期限なし';
 
       const quantitySpan = document.createElement('span');
-      quantitySpan.textContent = item.quantity || '';
+      quantitySpan.textContent = '個数：' + (item.quantity || '');
 
       meta.appendChild(groupSpan);
       meta.appendChild(document.createTextNode(' / '));
@@ -259,7 +261,7 @@ export const UI = {
       nameEl.textContent = item.name;
 
       const quantitySpan = document.createElement('span');
-      quantitySpan.textContent = item.quantity || '';
+      quantitySpan.textContent = '個数：' + (item.quantity || '');
 
       wrapper.appendChild(nameEl);
       wrapper.appendChild(document.createTextNode(' / '));

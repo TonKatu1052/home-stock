@@ -46,7 +46,7 @@ export const App = {
 
       inventoryNameInput.value = '';
       inventoryExpiryInput.value = '';
-      inventoryQuantityInput.value = '';
+      inventoryQuantityInput.value = '1';
       inventoryNameInput.focus();
     };
 
@@ -63,7 +63,7 @@ export const App = {
       this.save();
 
       shoppingNameInput.value = '';
-      shoppingQuantityInput.value = '';
+      shoppingQuantityInput.value = '1';
       shoppingNameInput.focus();
     };
 
